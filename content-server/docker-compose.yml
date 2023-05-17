@@ -1,0 +1,30 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    depends_on:
+      - mongodb
+  mongodb:
+    image: mongo
+    ports:
+      - '27017:27017'
+  backup:
+    build: ./backup
+    environment:
+      - AWS_ACCESS_KEY_ID=AKIAXC*******D6QV7
+      - AWS_SECRET_ACCESS_KEY=Ipk6*****************sfMV
+      - S3_BUCKET=application-backups
+      - AWS_DEFAULT_REGION=eu-central-1
+      - S3_MONGODB_PREFIX=mongodb
+      - S3_CONFIGS_PREFIX=configs
+      - BACKUP_NAME_FORMAT=mongodb-%Y-%m-%d-%H-%M-%S.archive
+    volumes:
+      - ./backup:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - mongodb
+
